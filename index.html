@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Special Birthday Carousel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        body {
+            overflow: hidden;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #1a0033, #4a0080);
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            touch-action: none;
+            animation: gradientShift 15s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .carousel {
+            position: relative;
+            z-index: 1;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .carousel-item {
+            --items: 14;
+            --width: clamp(280px, 85vw, 400px);
+            --height: clamp(400px, 70vh, 600px);
+            --x: calc(var(--active) * 800%);
+            --y: calc(var(--active) * 200%);
+            --rot: calc(var(--active) * 120deg);
+            --opacity: calc(var(--zIndex) / var(--items) * 3 - 2);
+            overflow: hidden;
+            position: absolute;
+            z-index: var(--zIndex);
+            width: var(--width);
+            height: var(--height);
+            margin: calc(var(--height) * -0.5) 0 0 calc(var(--width) * -0.5);
+            border-radius: 20px;
+            top: 50%;
+            left: 50%;
+            user-select: none;
+            transform-origin: 0% 100%;
+            box-shadow: 0 15px 50px 10px rgba(0, 0, 0, 0.5);
+            background: black;
+            transform: translate(var(--x), var(--y)) rotate(var(--rot));
+            transition: all 0.8s cubic-bezier(0.2, 1, 0.2, 1);
+        }
+
+        .carousel-box {
+            position: absolute;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transition: all 0.8s cubic-bezier(0.2, 1, 0.2, 1);
+            opacity: var(--opacity);
+            transform: scale(calc(1 + var(--active) * 0.05));
+        }
+
+        .carousel-box:before {
+            content: "";
+            position: absolute;
+            z-index: 1;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                rgba(0, 0, 0, 0.4),
+                rgba(0, 0, 0, 0) 30%,
+                rgba(0, 0, 0, 0) 50%,
+                rgba(0, 0, 0, 0.7)
+            );
+        }
+
+        .title {
+            position: absolute;
+            z-index: 2;
+            color: #fff;
+            bottom: 30px;
+            left: 30px;
+            right: 30px;
+            transition: all 0.8s cubic-bezier(0.2, 1, 0.2, 1);
+            font-size: clamp(18px, 4vw, 24px);
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            font-family: 'Playfair Display', serif;
+            font-weight: 400;
+            letter-spacing: 0.5px;
+            opacity: calc(var(--opacity) + 0.5);
+            text-align: center;
+        }
+
+        .num {
+            position: absolute;
+            z-index: 2;
+            color: #fff;
+            top: 20px;
+            left: 30px;
+            transition: all 0.8s cubic-bezier(0.2, 1, 0.2, 1);
+            font-size: clamp(24px, 8vw, 40px);
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+            opacity: calc(var(--opacity) * 0.7);
+            text-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            pointer-events: none;
+            transition: transform 0.8s cubic-bezier(0.2, 1, 0.2, 1);
+        }
+
+        .carousel-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .instructions {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            color: white;
+            text-align: center;
+            font-size: 16px;
+            opacity: 0.8;
+            width: 100%;
+            padding: 0 20px;
+            box-sizing: border-box;
+            pointer-events: none;
+            font-family: 'Poppins', sans-serif;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            animation: fadeInOut 3s ease-in-out infinite;
+        }
+
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 0.8; }
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 20px;
+            z-index: 10;
+        }
+
+        .nav-button {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+
+        .nav-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="carousel">
+        <div class="carousel-item">
+            <div class="carousel-box">
+                <div class="title">Hi Baby 🫂</div>
+                <div class="num">01</div>
+                <img src="./1.jpg" alt="Image 1" />
+            </div>
+        </div>
+
+        <div class="carousel-item">
+            <div class="carousel-box">
+                <div class="title">I want to tell you Something 😍</div>
+                <div class="num">02</div>
+                <img src="./2.jpg" alt="Image 2" />
+            </div>
+        </div>
+
+        <div class="carousel-item">
+            <div class="carousel-box">
+                <div class="title">Please Keep Swiping 😊</div>
+                <div class="num">03</div>
+                <img src="./3.jpg" alt="Image 3" />
+            </div>
+        </div>
+
+        <div class="carousel-item">
+            <div class="carousel-box">
+                <div class="title">You are Amazing 🤩</div>
+                <div class="num">04</div>
+                <img src="./4.jpg" alt="Image 4" />
+            </div>
+        </div>
+
+        <div class="carousel-item">
+            <div class="carousel-box">
+                <div class="title">Most Beautiful Person on Earth 💯</div>
+                <div class="num">05</div>
+                <img src="./5.jpg" alt="Image 5" />
+            </div>
+        </div>
+
+        <div class="carousel-item">
+            <div class="carousel-box">
+                <div class="title">And Cutest 🎀</div>
+                <div class="num">06</div>
+                <img src="./6.jpg" alt="Image 6" />
+            </div>
+        </div>
+
+        <div class="carousel-item">
+            <div class="carousel-box">
+                <div class="title">And Since I Met You 😗</div>
+                <div class="num">07</div>
+                <img src="./7.jpg" alt="Image 7" />
+            </div>
+        </div>
+
+        <div class="carousel-item">
+            <div class="carousel-box">
+                <div class="title">I Feel Very Lucky Every Day 😇</div>
+                <div class="num">08</div>
+                <img src="./8.jpg" alt="Image 8" />
+            </div>
+        </div>
+
+        <div class="carousel-item">
+            <div class="carousel-box">
+                <div class="title">And I Love You So Much!! 💗🫂</div>
+                <div class="num">09</div>
+                <img src="./9.jpg" alt="Image 9" />
+            </div>
+        </div>
+
+        <div class="carousel-item">
+            <div class="carousel-box">
+                <div class="title">Wish You A Very Happy Birthday Baby! 💐💞</div>
+                <div class="num">10</div>
+                <img src="./10.jpg" alt="Image 10" />
+            </div>
+        </div>
+
+        <div class="carousel-item">
+            <div class="carousel-box">
+                <div class="title">May All Your Dreams Come True! ✨</div>
+                <div class="num">11</div>
+                <img src="./11.jpg" alt="Image 11" />
+            </div>
+        </div>
+
+        <div class="carousel-item">
+            <div class="carousel-box">
+                <div class="title">Stay Blessed and Keep Smiling! 🌟</div>
+                <div class="num">12</div>
+                <img src="./12.jpg" alt="Image 12" />
+            </div>
+        </div>
+
+        <div class="carousel-item">
+            <div class="carousel-box">
+                <div class="title">You Mean the World to Me! 🌍</div>
+                <div class="num">13</div>
+                <img src="./13.jpg" alt="Image 13" />
+            </div>
+        </div>
+
+        <div class="carousel-item">
+            <div class="carousel-box">
+                <div class="title">Happy Birthday My Love! 🎂💝</div>
+                <div class="num">14</div>
+                <img src="./14.jpg" alt="Image 14" />
+            </div>
+        </div>
+    </div>
+
+    <div class="navigation">
+        <button class="nav-button" onclick="prevSlide()">Previous</button>
+        <button class="nav-button" onclick="nextSlide()">Next</button>
+    </div>
+
+    <!-- //<div class="instructions">Swipe or use arrows to navigate</div> -->
+
+    <script>
+        // Changed initial progress to 0 to show first image
+        let progress = 0;
+        let startX = 0;
+        let active = 0;
+        let isDown = false;
+
+        const speedDrag = -0.1;
+        const $items = document.querySelectorAll('.carousel-item');
+        const numItems = $items.length;
+
+        const getZindex = (array, index) => (
+            array.map((_, i) => (index === i) ? array.length : array.length - Math.abs(index - i))
+        );
+
+        const displayItems = (item, index, active) => {
+            const zIndex = getZindex([...$items], active)[index];
+            item.style.setProperty('--zIndex', zIndex);
+            item.style.setProperty('--active', (index-active)/$items.length);
+        };
+
+        const animate = () => {
+            progress = Math.max(0, Math.min(progress, 100));
+            active = Math.floor(progress/100*(numItems-1));
+            
+            $items.forEach((item, index) => displayItems(item, index, active));
+        };
+
+        const handleMouseMove = (e) => {
+            if (!isDown) return;
+            e.preventDefault();
+            const x = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+            const mouseProgress = (x - startX) * speedDrag;
+            progress = progress + mouseProgress;
+            startX = x;
+            animate();
+        };
+
+        const handleMouseDown = e => {
+            isDown = true;
+            startX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+        };
+
+        const handleMouseUp = () => {
+            isDown = false;
+        };
+
+        // Navigation functions
+        const nextSlide = () => {
+            progress = Math.min(100, progress + (100/numItems));
+            animate();
+        };
+
+        const prevSlide = () => {
+            progress = Math.max(0, progress - (100/numItems));
+            animate();
+        };
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
+        });
+
+        // Touch and mouse events
+        document.addEventListener('mousedown', handleMouseDown);
+        document.addEventListener('mousemove', handleMouseMove);
+        document.addEventListener('mouseup', handleMouseUp);
+        document.addEventListener('touchstart', handleMouseDown);
+        document.addEventListener('touchmove', handleMouseMove);
+        document.addEventListener('touchend', handleMouseUp);
+
+        // Click events for items
+        $items.forEach((item, i) => {
+            item.addEventListener('click', () => {
+                progress = (i/numItems) * 100;
+                animate();
+            });
+        });
+
+        // Initial animation
+        animate();
+    </script>
+</body>
+</html>
